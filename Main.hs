@@ -1,6 +1,8 @@
 module Main where
 
+
 import qualified Data.List as L
+
 
 main :: IO ()
 main = do
@@ -25,7 +27,7 @@ type Square = (Int, Int)
 
 
 parseSquare :: String -> Square
-parseSquare s = (read $ res !! 0, read $ res !! 1)
+parseSquare s = (read $ head res, read $ last res)
     where res = words s
 
 
@@ -37,10 +39,10 @@ validate n m (x, y)
 
 
 -- We'll use Warnsdorff's Rule (https://en.wikipedia.org/wiki/Knight%27s_tour) with
--- random tie-breaking. This means that for suitably large boards, the algorithm
+-- undefined tie-breaking. This means that for suitably large boards, the algorithm
 -- may fail to find a tour even when a tour exists.
 tour :: Int -> Int -> Square -> Maybe [Square]
-tour n m s = tour' [(x, y) | x <- [0..n], y <- [0..m]] [] s
+tour n m s = tour' (filter (/= s) [(x, y) | x <- [1..n], y <- [1..m]]) [] s
 
 
 tour' :: [Square] -> [Square] -> Square -> Maybe [Square]
@@ -51,4 +53,15 @@ tour' remaining t s = do
 
 
 nextSquare :: [Square] -> [Square] -> Square -> Maybe Square
-nextSquare rs t s = Nothing
+nextSquare rs t s
+    | null nexts        = Nothing
+    | otherwise         = Just . snd . minimum $
+                            [(length (surrounding next rs), next) | next <- nexts]
+        where nexts = surrounding s rs
+
+
+surrounding :: Square -> [Square] -> [Square]
+surrounding (x, y) rs = filter (`elem` rs) [ (x + 1, y + 2), (x + 2, y + 1)
+                                           , (x - 1, y + 2), (x + 2, y - 1)
+                                           , (x - 1, y - 2), (x - 2, y - 1)
+                                           , (x + 1, y - 2), (x - 2, y + 1)]
