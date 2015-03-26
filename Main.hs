@@ -91,7 +91,7 @@ drawTour (Just sqs) fname = do
     image <- let (x, y) = maximum sqs in newImage (x * sqSize + 2 * border, y * sqSize + 2 * border)
     fillImage (rgb 0 0 0) image 
     (sequence_ . getZipList) $ drawFilledRectangle <$> ZipList (map upLeft sqs) <*> ZipList (map lowRight sqs)
-            <*> ZipList (map getColor sqs) <*> ZipList (repeat image)
+                                                   <*> ZipList (map getColor sqs) <*> ZipList (repeat image)
     drawFilledRectangle (upLeft . head $ sqs) (lowRight . head $ sqs) (rgb 0 200 0) image
     drawFilledRectangle (upLeft . last $ sqs) (lowRight . last $ sqs) (rgb 200 0 0) image
     (sequence_ . getZipList) $ drawLine <$> ZipList (map getCenter sqs) <*> ZipList (map getCenter (tail sqs))
