@@ -12,7 +12,7 @@ sq_size :: Int
 sq_size = 80
 
 border :: Int
-border = 10  -- pixels
+border = 5
 
 
 main :: IO ()
@@ -92,6 +92,8 @@ drawTour (Just sqs) fname = do
     fillImage (rgb 0 0 0) image 
     (sequence . getZipList) $ drawFilledRectangle <$> ZipList (map upLeft sqs) <*> ZipList (map lowRight sqs)
             <*> ZipList (map getColor sqs) <*> ZipList (repeat image)
+    drawFilledRectangle (upLeft . head $ sqs) (lowRight . head $ sqs) (rgb 0 200 0) image
+    drawFilledRectangle (upLeft . last $ sqs) (lowRight . last $ sqs) (rgb 200 0 0) image
     savePngFile (fname ++ ".png") image
 
 
