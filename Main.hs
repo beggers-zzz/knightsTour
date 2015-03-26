@@ -8,8 +8,8 @@ import Control.Applicative
 
 
 -- used for image generation
-sq_size :: Int
-sq_size = 80
+sqSize :: Int
+sqSize = 80
 
 border :: Int
 border = 5
@@ -88,24 +88,30 @@ drawTour :: Maybe [Square] -> String -> IO ()
 drawTour Nothing _ = return ()
 drawTour _ "" = return ()
 drawTour (Just sqs) fname = do
-    image <- let (x, y) = maximum sqs in newImage (x * sq_size + 2 * border, y * sq_size + 2 * border)
+    image <- let (x, y) = maximum sqs in newImage (x * sqSize + 2 * border, y * sqSize + 2 * border)
     fillImage (rgb 0 0 0) image 
-    (sequence . getZipList) $ drawFilledRectangle <$> ZipList (map upLeft sqs) <*> ZipList (map lowRight sqs)
+    (sequence_ . getZipList) $ drawFilledRectangle <$> ZipList (map upLeft sqs) <*> ZipList (map lowRight sqs)
             <*> ZipList (map getColor sqs) <*> ZipList (repeat image)
     drawFilledRectangle (upLeft . head $ sqs) (lowRight . head $ sqs) (rgb 0 200 0) image
     drawFilledRectangle (upLeft . last $ sqs) (lowRight . last $ sqs) (rgb 200 0 0) image
+    (sequence_ . getZipList) $ drawLine <$> ZipList (map getCenter sqs) <*> ZipList (map getCenter (tail sqs))
+                                        <*> ZipList (repeat (rgb 0 0 0)) <*> ZipList (repeat image)
     savePngFile (fname ++ ".png") image
 
 
 upLeft :: Square -> Point
-upLeft (x, y) = (border + (x - 1)*sq_size, border + (y - 1)*sq_size)
+upLeft (x, y) = (border + (x - 1)*sqSize, border + (y - 1)*sqSize)
 
 
 lowRight :: Square -> Point
-lowRight (x, y) = (border + x*sq_size, border + y*sq_size)
+lowRight (x, y) = (border + x*sqSize, border + y*sqSize)
 
 
 getColor :: Square -> Color
 getColor (x, y)
     | even (x + y)  = rgb 100 100 100
     | otherwise     = rgb 200 200 200
+
+
+getCenter :: Square -> Point
+getCenter sq = let (x1, y1) = upLeft sq in (x1 + sqSize `div` 2, y1 + sqSize `div` 2)
