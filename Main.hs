@@ -96,11 +96,11 @@ drawTour (Just sqs) fname = do
 
 
 upLeft :: Square -> Point
-upLeft s = (0,0)
+upLeft (x, y) = (border + (x - 1)*sq_size, border + (y - 1)*sq_size)
 
 
 lowRight :: Square -> Point
-lowRight s = (0,0)
+lowRight (x, y) = (border + x*sq_size, border + y*sq_size)
 
 
 getColor :: Square -> Color
